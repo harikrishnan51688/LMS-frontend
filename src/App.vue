@@ -1,6 +1,6 @@
-<script setup>
+<!-- <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-</script>
+</script> -->
 
 <template>
   <header>
@@ -22,7 +22,9 @@ import { RouterLink, RouterView } from 'vue-router'
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link to="/" class="nav-link mx-2 active" aria-current="page">Home</router-link>
+              <router-link to="/" class="nav-link mx-2 active" aria-current="page"
+                >Home</router-link
+              >
             </li>
             <li class="nav-item">
               <router-link to="/ebooks" class="nav-link mx-2">Ebooks</router-link>
@@ -34,15 +36,15 @@ import { RouterLink, RouterView } from 'vue-router'
               >
             </li>
             <!-- {% endif %} -->
-            <li class="nav-item">
-              <a class="nav-link mx-2" href="{{ url_for('logout') }}">Logout</a>
+            <li v-if="isLoggedIn" class="nav-item">
+              <a @click="handleLogout" class="nav-link mx-2" href="#">Logout</a>
             </li>
             <!-- {% else %} -->
-            <li class="nav-item">
+            <li v-if="!isLoggedIn" class="nav-item">
               <router-link to="/login" class="nav-link mx-2">Login</router-link>
             </li>
             <!-- {% endif %} {% if current_user.is_superuser %} -->
-            <li class="nav-item">
+            <li v-if="isSuperUser" class="nav-item">
               <a class="nav-link mx-2" href="{{ url_for('dashboard') }}">Admin</a>
             </li>
             <!-- {% endif %} -->
@@ -54,3 +56,28 @@ import { RouterLink, RouterView } from 'vue-router'
 
   <RouterView />
 </template>
+
+<script>
+import { useAuthStore } from '@/stores/auth'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router';
+
+export default {
+  setup() {
+    const authStore = useAuthStore()
+    const router = useRouter()
+    const isLoggedIn = computed(() => authStore.isLoggedIn)
+    const isSuperUser = computed(() => authStore.isSuperUser)
+    const handleLogout = () => {
+      authStore.logout()
+      router.push('/login')
+    }
+
+    onMounted(() => {
+      authStore.checkAuth()
+    })
+
+    return { isLoggedIn, isSuperUser, handleLogout }
+  }
+}
+</script>

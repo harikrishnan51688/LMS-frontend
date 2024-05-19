@@ -50,7 +50,7 @@
 
             <div id="emailHelp" class="form-text text-center mb-5 text-dark">
               Not Registered?
-              <a href="{{ url_for('register')}}" class="text-dark fw-bold"> Create an Account</a>
+              <router-link to="/register" class="text-dark fw-bold"> Create an Account</router-link>
             </div>
           </div>
         </div>
