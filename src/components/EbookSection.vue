@@ -43,7 +43,6 @@ export default {
         .get(path)
         .then((res) => {
           this.books = res.data.books
-          console.log(this.books)
         })
         .catch((error) => {
           console.error(error)

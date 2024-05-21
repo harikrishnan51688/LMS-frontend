@@ -29,25 +29,20 @@ import { RouterLink, RouterView } from 'vue-router'
             <li class="nav-item">
               <router-link to="/ebooks" class="nav-link mx-2">Ebooks</router-link>
             </li>
-            <!-- {% if current_user.is_authenticated %} {% if not current_user.is_superuser %} -->
-            <li class="nav-item">
+            <li v-if="isLoggedIn && !isSuperUser" class="nav-item">
               <a class="nav-link mx-2" href="{{ url_for('user', user_id=current_user.id) }}"
                 >Profile</a
               >
             </li>
-            <!-- {% endif %} -->
             <li v-if="isLoggedIn" class="nav-item">
               <a @click="handleLogout" class="nav-link mx-2" href="#">Logout</a>
             </li>
-            <!-- {% else %} -->
             <li v-if="!isLoggedIn" class="nav-item">
               <router-link to="/login" class="nav-link mx-2">Login</router-link>
             </li>
-            <!-- {% endif %} {% if current_user.is_superuser %} -->
             <li v-if="isSuperUser" class="nav-item">
               <a class="nav-link mx-2" href="{{ url_for('dashboard') }}">Admin</a>
             </li>
-            <!-- {% endif %} -->
           </ul>
         </div>
       </div>
