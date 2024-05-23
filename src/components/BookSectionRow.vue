@@ -10,7 +10,7 @@ defineProps({
 <template>
   <div v-for="book in books" :key="book.id" class="col-lg-3 col-md-6 mb-4">
     <div>
-      <a href="#">
+      <router-link :to="{ name: 'book', params: { id: book.id } }">
         <img
           class="card-img-top img-fluid"
           style="width: 200px; height: 300px"
@@ -21,7 +21,7 @@ defineProps({
           <h4 class="card-title">{{ book.title }}</h4>
           <p class="card-text">{{ book.subtitle }}</p>
         </div>
-      </a>
+      </router-link>
     </div>
   </div>
 </template>

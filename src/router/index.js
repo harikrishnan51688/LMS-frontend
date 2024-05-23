@@ -31,6 +31,17 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: () => import('@/components/RegisterPage.vue')
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('@/components/SearchPage.vue')
+    },
+    {
+      path: '/book/:id',
+      name: 'book',
+      props: true,
+      component: () => import('@/components/SingleBookPage.vue')
     }
   ]
 })
