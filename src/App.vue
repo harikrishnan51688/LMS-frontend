@@ -30,18 +30,16 @@ import { RouterLink, RouterView } from 'vue-router'
               <router-link to="/ebooks" class="nav-link mx-2">Ebooks</router-link>
             </li>
             <li v-if="isLoggedIn && !isSuperUser" class="nav-item">
-              <a class="nav-link mx-2" href="{{ url_for('user', user_id=current_user.id) }}"
-                >Profile</a
-              >
+              <router-link to="/profile" class="nav-link mx-2">Profile</router-link>
+            </li>
+            <li v-if="isSuperUser" class="nav-item">
+              <a class="nav-link mx-2" href="{{ url_for('dashboard') }}">Admin</a>
             </li>
             <li v-if="isLoggedIn" class="nav-item">
               <a @click="handleLogout" class="nav-link mx-2" href="#">Logout</a>
             </li>
             <li v-if="!isLoggedIn" class="nav-item">
               <router-link to="/login" class="nav-link mx-2">Login</router-link>
-            </li>
-            <li v-if="isSuperUser" class="nav-item">
-              <a class="nav-link mx-2" href="{{ url_for('dashboard') }}">Admin</a>
             </li>
           </ul>
         </div>
@@ -55,7 +53,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <script>
 import { useAuthStore } from '@/stores/auth'
 import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
 export default {
   setup() {

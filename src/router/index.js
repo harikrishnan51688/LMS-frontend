@@ -42,7 +42,12 @@ const router = createRouter({
       name: 'book',
       props: true,
       component: () => import('@/components/SingleBookPage.vue')
-    }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/components/ProfilePage.vue')
+    },
   ]
 })
 
