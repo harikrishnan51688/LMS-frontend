@@ -21,9 +21,9 @@
         </div>
         <!-- <span class="badge bg-primary rounded-pill">$19.99</span> -->
         <div>
-          <a href="{{ url_for('cancel_request', request_id=request.request_id )}}">
-            <button type="button" class="btn btn-danger rounded-pill btn-sm">cancel request</button>
-          </a>
+          <!-- <a href="{{ url_for('cancel_request', request_id=request.request_id )}}"> -->
+            <button @click="cancelRequest(request.request_id)" type="button" class="btn btn-danger rounded-pill btn-sm">cancel request</button>
+          <!-- </a> -->
         </div>
       </li>
     </ul>
@@ -63,9 +63,8 @@
           </a>
           <a
             v-if="isLoggedIn & !isSuperUser"
-            href="{{ url_for('return_book', book_id=book.id, borrow_id=book_.borrow_id ) }}"
           >
-            <button type="button" class="btn btn-dark rounded-pill btn-sm me-1">return</button>
+            <button @click="returnBook(book.borrow_id, book.book_id)" type="button" class="btn btn-dark rounded-pill btn-sm me-1">return</button>
           </a>
           <a
             :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.book_details.file}`"
@@ -142,6 +141,32 @@ export default {
         this.borrowed_books = response.data.borrowed_books
       } catch (error) {
         console.error('Error fetching UserProfile details', error)
+      }
+    },
+    async cancelRequest(request_id) {
+      try {
+        const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
+          headers: { 'x-access-token': this.user.token },
+          params: { 'request_id': request_id }
+        })
+        if(response.status === 200){
+          await this.getProfile()
+        }
+      } catch(error) {
+        console.error("Error canceling request", error)
+      }
+    },
+    async returnBook(borrow_id, book_id) {
+      try {
+        const response = await axios.get('http://localhost:5000/api/returnbook', {
+          headers: { 'x-access-token': this.user.token },
+          params: { 'borrow_id': borrow_id, 'book_id': book_id }
+        })
+        if(response.status === 200){
+          await this.getProfile()
+        }
+      } catch(error) {
+        console.error("Error returning book", error)
       }
     }
   },

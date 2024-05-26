@@ -69,9 +69,8 @@
         </a>
         <a
           v-if="!isSuperUser & !isBookBorrowed"
-          href="{{ url_for('request_book', book_id=book.id)}}"
         >
-          <button class="btn btn-primary me-1">Request book</button>
+          <button @click="requestBook(book.id)" class="btn btn-primary me-1">Request book</button>
         </a>
         <a
           v-if="isSuperUser"
@@ -90,6 +89,7 @@
 import { useAuthStore } from '@/stores/auth'
 import { computed } from 'vue'
 import axios from 'axios'
+import {useToast} from 'vue-toast-notification';
 
 export default {
   name: 'BookPage',
@@ -97,8 +97,9 @@ export default {
     const authStore = useAuthStore()
     const isLoggedIn = computed(() => authStore.isLoggedIn)
     const isSuperUser = computed(() => authStore.isSuperUser)
+    const $toast = useToast();
 
-    return { isLoggedIn, isSuperUser }
+    return { isLoggedIn, isSuperUser, $toast }
   },
   data() {
     return {
@@ -128,6 +129,21 @@ export default {
         this.isBookBorrowed = response.data.isBorrowed
       } catch (error) {
         console.error('Error fetching borrow api', error)
+      }
+    },
+    async requestBook(book_id) {
+      try {
+        const response = await axios.get('http://localhost:5000/api/requestbook', {
+          headers: { 'x-access-token': this.user.token },
+          params: { 'book_id': book_id }
+        })
+        if(response.status === 200){
+          this.$toast.default(response.data.message, {
+            duration: 2000
+          })
+        }
+      } catch(error) {
+        console.error("Error requesting book", error)
       }
     }
   },

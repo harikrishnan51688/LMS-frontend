@@ -46,7 +46,6 @@ import { RouterLink, RouterView } from 'vue-router'
       </div>
     </nav>
   </header>
-
   <RouterView />
 </template>
 
@@ -65,11 +64,9 @@ export default {
       authStore.logout()
       router.push('/login')
     }
-
     onMounted(() => {
       authStore.checkAuth()
     })
-
     return { isLoggedIn, isSuperUser, handleLogout }
   }
 }
