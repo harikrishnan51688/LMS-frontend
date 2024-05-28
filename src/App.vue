@@ -33,7 +33,7 @@ import { RouterLink, RouterView } from 'vue-router'
               <router-link to="/profile" class="nav-link mx-2">Profile</router-link>
             </li>
             <li v-if="isSuperUser" class="nav-item">
-              <a class="nav-link mx-2" href="{{ url_for('dashboard') }}">Admin</a>
+              <router-link to="/admin" class="nav-link mx-2">Admin</router-link>
             </li>
             <li v-if="isLoggedIn" class="nav-item">
               <a @click="handleLogout" class="nav-link mx-2" href="#">Logout</a>

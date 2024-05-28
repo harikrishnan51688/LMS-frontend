@@ -48,6 +48,21 @@ const router = createRouter({
       name: 'profile',
       component: () => import('@/components/ProfilePage.vue')
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('@/views/AdminView.vue')
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/components/DashboardPage.vue')
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('@/components/UsersPage.vue')
+    },
   ]
 })
 
