@@ -120,7 +120,7 @@ export default {
       axios
         .get(path)
         .then((res) => {
-          this.recently_added = this.sortAndLimitBooks(res.data.ebooks)
+          this.recently_added = this.sortAndLimitBooks(res.data.books)
         })
         .catch((error) => {
           console.error(error)

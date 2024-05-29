@@ -63,6 +63,21 @@ const router = createRouter({
       name: 'users',
       component: () => import('@/components/UsersPage.vue')
     },
+    {
+      path: '/books',
+      name: 'books',
+      component: () => import('@/components/AllBooks.vue')
+    },
+    {
+      path: '/requests',
+      name: 'requests',
+      component: () => import('@/components/BookRequests.vue')
+    },
+    {
+      path: '/add-book',
+      name: 'addbook',
+      component: () => import('@/components/AddBook.vue')
+    },
   ]
 })
 

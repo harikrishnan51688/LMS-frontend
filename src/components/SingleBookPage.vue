@@ -139,7 +139,8 @@ export default {
         })
         if(response.status === 200){
           this.$toast.default(response.data.message, {
-            duration: 2000
+            duration: 2000,
+            type: response.data.status
           })
         }
       } catch(error) {

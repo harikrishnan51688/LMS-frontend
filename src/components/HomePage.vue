@@ -82,8 +82,8 @@ export default {
     async getBooks() {
       try {
         const response = await axios.get('http://localhost:5000/api/books')
-        this.books = response.data.ebooks
-        this.allBooks = response.data.ebooks
+        this.books = response.data.books
+        this.allBooks = response.data.books
       } catch (error) {
         console.error("Error fetching books:", error)
       }
