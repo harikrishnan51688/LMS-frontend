@@ -28,9 +28,9 @@
                     <td>{{ user.return_count }}</td>
                     <td>{{ user.is_superuser }}</td>
                     <td v-if="!user.is_superuser">
-                    <!-- <a href="{{ url_for('delete_user', user_id=user.id )}}"> -->
-                    <span class="badge bg-danger rounded-pill">Remove</span></td>
-                    <!-- </a> -->
+                    <a @click="removeUser(user.id)" class="remove-button">
+                    <span class="badge bg-danger rounded-pill">Remove</span></a></td>
+                    
                 </tr>
             </tbody>
         </table>
@@ -41,8 +41,10 @@
 import Sidebar from '@/components/SidebarLine.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import {useToast} from 'vue-toast-notification'
 
 const user = JSON.parse(localStorage.getItem('user')) || null
+const $toast = useToast()
 const allusers = ref([])
 
 const getusers = async () => {
@@ -55,7 +57,33 @@ const getusers = async () => {
     console.error('Error fetching users data', error)
   }
 }
+
+const removeUser = async (user_id) => {
+  try {
+    const response = await axios.delete('http://localhost:5000/api/removeuser', {
+      headers: { 'x-access-token': user.token },
+      params: {'user_id': user_id}
+    })
+    if (response.status === 200){
+      $toast.default(response.data.message, {
+            duration: 2000,
+            type: response.data.status,
+            position: 'top-right'
+          })
+      await getusers()
+    }
+  } catch(error){
+    console.error("Error removing user", error)
+  }
+}
+
 onMounted(() => {
   getusers()
 })
 </script>
+
+<style scoped>
+.remove-button {
+  cursor: pointer;
+}
+</style>

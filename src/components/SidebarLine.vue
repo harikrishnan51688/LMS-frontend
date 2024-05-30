@@ -8,7 +8,7 @@
           <li class="nav-item"><router-link to="/requests" class="nav-link text-white">Requests</router-link></li>
           <li class="nav-item"><router-link to="/add-book" class="nav-link text-white">Add book</router-link></li>
           <li class="nav-item"><router-link to="/add-section" class="nav-link text-white">Add section</router-link></li>
-          <li class="nav-item"><router-link to="/manage-section" class="nav-link text-white">Manage section</router-link></li>
+          <li class="nav-item"><router-link to="/sections" class="nav-link text-white">Manage section</router-link></li>
         </ul>
       </div>
     </template>

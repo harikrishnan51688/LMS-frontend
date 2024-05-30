@@ -1,12 +1,3 @@
-<script setup>
-defineProps({
-  section_id: {
-    type: Number,
-    required: true
-  }
-})
-</script>
-
 <template>
   <div v-for="book in books" :key="book.id" class="col-lg-3 col-md-6 mb-4">
     <div>
@@ -26,31 +17,30 @@ defineProps({
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios'
+import { ref, onMounted } from 'vue'
 
-export default {
-  name: 'BookSection',
-  data() {
-    return {
-      books: []
-    }
-  },
-  methods: {
-    getBooksFromSection() {
-      const path = `http://localhost:5000/api/sections/${this.section_id}`
-      axios
-        .get(path)
-        .then((res) => {
-          this.books = res.data.books
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    }
-  },
-  created() {
-    this.getBooksFromSection()
+const props = defineProps({
+  section_id: {
+    type: Number,
+    required: true
+  }
+})
+
+const books = ref([])
+
+const getBooksFromSection = async () => {
+  const path = `http://localhost:5000/api/sections/${props.section_id}`
+  try {
+    const response = await axios.get(path)
+    books.value = response.data.books
+  } catch (error) {
+    console.error('Error fetching book from sections', error)
   }
 }
+
+onMounted(() => {
+  getBooksFromSection()
+})
 </script>

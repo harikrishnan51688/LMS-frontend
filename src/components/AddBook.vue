@@ -62,7 +62,7 @@
 import Sidebar from '@/components/SidebarLine.vue'
 import { ref } from 'vue'
 import axios from 'axios'
-import {useToast} from 'vue-toast-notification';
+import {useToast} from 'vue-toast-notification'
 
 const $toast = useToast()
 const user = JSON.parse(localStorage.getItem('user')) || null

@@ -61,7 +61,6 @@ import EbookSection from './BookSectionRow.vue'
           </a>
         </div>
       </div>
-
     </div>
     <div v-else class="row">
       <div class="col-lg-12">
@@ -86,24 +85,23 @@ import EbookSection from './BookSectionRow.vue'
         </div>
       </div>
 
-      <div v-for="section in sections" :key="section.id" class="row">
-        <div class="col-lg-12">
+      <div v-for="section in sections" :key="section.section_id" class="row">
+        <div v-if="section.book_count > 0" class="col-lg-12">
           <h2 class="mt-4">{{ section.section_name }}</h2>
           <hr class="short-hr" />
         </div>
         <!-- Book Cards Section -->
         <EbookSection :section_id="section.section_id" />
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { searchBooks } from '@/utils/searchBooks';
+import { searchBooks } from '@/utils/searchBooks'
 
-export default {  
+export default {
   name: 'HomePage',
   data() {
     return {
@@ -134,7 +132,7 @@ export default {
       axios
         .get(path)
         .then((res) => {
-          this.sections = res.data
+          this.sections = res.data.sections
         })
         .catch((error) => {
           console.error(error)
