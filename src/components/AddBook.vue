@@ -30,7 +30,7 @@
               </div>
               <div class="mb-3">
                 <label for="pages" class="form-label">No. of pages</label>
-                <input v-model="pages" class="form-control" id="pages" min="1" type="number" required>
+                <input v-model="pages" class="form-control" id="pages" value="" min="1" type="number" required>
               </div>
               <div class="mb-3">
                 <label for="author" class="form-label">Author</label>
@@ -38,7 +38,7 @@
               </div>
               <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
-                <input v-model="price" class="form-control" id="price" min="1" type="number" required/>
+                <input v-model="price" class="form-control" id="price" min="1" value="" type="number" required/>
               </div>
               <div class="mb-3">
                 <label for="file" class="form-label">File upload</label>

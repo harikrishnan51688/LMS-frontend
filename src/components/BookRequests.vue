@@ -22,12 +22,18 @@
         </div>
         <!-- <span class="badge bg-primary rounded-pill">$19.99</span> -->
         <div>
-          <a href="{{ url_for('approve_request', request_id=request.request_id) }}">
-            <button type="button" class="btn btn-success rounded-pill btn-sm me-1">Approve</button>
-          </a>
-          <a href="{{ url_for('cancel_request', request_id=request.request_id )}}">
-            <button type="button" class="btn btn-danger rounded-pill btn-sm me-1">Cancel</button>
-          </a>
+          <!-- <a @click="approveRequest(request.request_id)"> -->
+          <button
+            @click="approveRequest(request.request_id)"
+            type="button"
+            class="btn btn-success rounded-pill btn-sm me-1"
+          >
+            Approve
+          </button>
+          <!-- </a> -->
+          <!-- <a href="{{ url_for('cancel_request', request_id=request.request_id )}}"> -->
+            <button @click="cancelRequest(request.request_id)" type="button" class="btn btn-danger rounded-pill btn-sm me-1">Cancel</button>
+          <!-- </a> -->
         </div>
       </li>
     </ul>
@@ -41,7 +47,9 @@
 import Sidebar from '@/components/SidebarLine.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toast-notification'
 
+const $toast = useToast()
 const user = JSON.parse(localStorage.getItem('user')) || null
 const requests = ref([])
 
@@ -53,6 +61,42 @@ const getrequests = async () => {
     requests.value = response.data.requests
   } catch (error) {
     console.error('Error fetching user requests', error)
+  }
+}
+
+const approveRequest = async (request_id) => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/approve-request', {
+      headers: { 'x-access-token': user.token },
+      params: { request_id: request_id }
+    })
+    if (response.status === 200) {
+      $toast.default(response.data.message, {
+        type: response.data.status,
+        duration: 2000
+      })
+      getrequests()
+    }
+  } catch (error) {
+    console.error('Error approving request', error)
+  }
+}
+
+const cancelRequest = async (request_id) => {
+  try {
+    const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
+      headers: { 'x-access-token': user.token },
+      params: { request_id: request_id }
+    })
+    if (response.status === 200) {
+      $toast.default(response.data.message, {
+        type: response.data.status,
+        duration: 2000
+      })
+      getrequests()
+    }
+  } catch (error) {
+    console.error('Error canceling request', error)
   }
 }
 onMounted(() => {
