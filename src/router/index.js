@@ -88,6 +88,11 @@ const router = createRouter({
       name: 'addsection',
       component: () => import('@/components/AddSection.vue')
     },
+    {
+      path: '/manage-section/:section_id',
+      name: 'managesection',
+      component: () => import('@/components/ManageSection.vue')
+    },
   ]
 })
 
