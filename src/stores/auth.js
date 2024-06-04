@@ -64,6 +64,37 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.resetState()
+    },
+
+    async register(email, password, name) {
+      try {
+        const data = {
+          email: email,
+          password: password,
+          name: name
+        }
+        const response = await axios.post(
+          'http://localhost:5000/api/register',
+          JSON.stringify(data),
+          {
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+        if (response.data.token) {
+          this.user = response.data
+          localStorage.setItem('user', JSON.stringify(response.data))
+
+          const token = response.data.token
+          const payload = JSON.parse(atob(token.split('.')[1]))
+          this.email = payload.email
+          this.is_superuser = payload.is_superuser
+
+          return response.data
+        }
+        return response.data
+      } catch (error) {
+        this.resetState()
+      }
     }
   },
   getters: {

@@ -79,12 +79,12 @@
               <div class="mb-3">
                 <label for="file" class="form-label">File upload</label>
                 <input @change="handleFileUpload($event, 'file')" class="form-control" id="file" type="file"/>
-                <a :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${file}`" target="_blank" class="link-primary">Show previous file</a>
+                <a :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${file}`" target="_blank" class="link-primary">Show current file</a>
               </div>
               <div class="mb-3">
                 <label for="image" class="form-label">Image</label>
                 <input @change="handleFileUpload($event, 'image')" class="form-control" id="image" type="file"/>
-                <a :href="`http://127.0.0.1:5000/static/${image}`" target="_blank" class="link-primary">Show previous image</a>
+                <a :href="`http://127.0.0.1:5000/static/${image}`" target="_blank" class="link-primary">Show current image</a>
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>

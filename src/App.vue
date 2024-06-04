@@ -49,25 +49,22 @@ import { RouterLink, RouterView } from 'vue-router'
   <RouterView />
 </template>
 
-<script>
+<script setup>
 import { useAuthStore } from '@/stores/auth'
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-export default {
-  setup() {
-    const authStore = useAuthStore()
-    const router = useRouter()
-    const isLoggedIn = computed(() => authStore.isLoggedIn)
-    const isSuperUser = computed(() => authStore.isSuperUser)
-    const handleLogout = () => {
-      authStore.logout()
-      router.push('/login')
-    }
-    onMounted(() => {
-      authStore.checkAuth()
-    })
-    return { isLoggedIn, isSuperUser, handleLogout }
-  }
+const authStore = useAuthStore()
+const router = useRouter()
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isSuperUser = computed(() => authStore.isSuperUser)
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
 }
+
+onMounted(() => {
+  authStore.checkAuth()
+})
 </script>

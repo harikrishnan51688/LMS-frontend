@@ -15,7 +15,7 @@
               />
             </div>
 
-            <form @submit.prevent="login" class="form">
+            <form @submit.prevent="register" class="form">
               <div class="mb-3 required">
                 <label class="form-label" for="email">Email</label>
                 <input class="form-control" id="email" v-model="email" required type="text" />
@@ -34,7 +34,7 @@
 
               <div class="mb-3 required">
                 <label class="form-label" for="name">Name</label>
-                <input class="form-control" id="name" v-model="email" required type="text" />
+                <input class="form-control" id="name" v-model="name" required type="text" />
               </div>
 
               <input
@@ -56,3 +56,40 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useToast } from 'vue-toast-notification'
+
+const authStore = useAuthStore()
+const $toast = useToast()
+const router = useRouter()
+const email = ref('')
+const password = ref('')
+const name = ref('')
+
+const register = async () => {
+  try {
+    const response = await authStore.register(email.value, password.value, name.value)
+    console.log(response)
+    if (response.token) {
+      $toast.success('Account created', {
+        duration: 2000,
+        position: 'top-right'
+      })
+      router.push('/')
+    }
+    if (response.message) {
+      $toast.default(response.message, {
+        type: response.status,
+        duration: 2000,
+        position: 'top-right'
+      })
+    }
+  } catch (error) {
+    console.error('Error while creating account', error)
+  }
+}
+</script>
