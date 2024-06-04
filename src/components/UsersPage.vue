@@ -20,9 +20,10 @@
             <tbody>
                 <tr v-for="user in allusers" :key="user.id">
                     <td>{{ user.id }}</td>
-                    <td> <a href="{{ url_for('user', user_id=user.id) }}"> {{ user.name }}</a></td>
-                    <td><a href="{{ url_for('user', user_id=user.id) }}">{{ user.email }}</a></td>
-                    <td><a href="{{ url_for('user', user_id=user.id) }}">{{ user.date }}</a></td>
+                    <td><router-link :to="{name: 'profile', params: { user_id: user.id} }"> {{ user.name }}</router-link></td>
+                    <td><router-link :to="{name: 'profile', params: { user_id: user.id} }">{{ user.email }}</router-link></td>
+                    <td><router-link :to="{name: 'profile', params: { user_id: user.id} }">{{ user.date }}</router-link></td>
+                    
                     <td>{{ user.request_count }}</td>
                     <td>{{ user.borrow_count }}</td>
                     <td>{{ user.return_count }}</td>

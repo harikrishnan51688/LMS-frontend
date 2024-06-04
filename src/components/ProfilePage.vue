@@ -22,7 +22,13 @@
         <!-- <span class="badge bg-primary rounded-pill">$19.99</span> -->
         <div>
           <!-- <a href="{{ url_for('cancel_request', request_id=request.request_id )}}"> -->
-            <button @click="cancelRequest(request.request_id)" type="button" class="btn btn-danger rounded-pill btn-sm">cancel request</button>
+          <button
+            @click="cancelRequest(request.request_id)"
+            type="button"
+            class="btn btn-danger rounded-pill btn-sm"
+          >
+            cancel request
+          </button>
           <!-- </a> -->
         </div>
       </li>
@@ -57,14 +63,18 @@
         <div>
           <a
             v-if="isSuperUser"
-            href="{{ url_for('revoke_access', user_id=user_id, book_id=book.id, borrow_id=book_.borrow_id ) }}"
+            href="#"
           >
-            <button type="button" class="btn btn-danger rounded-pill btn-sm me-1">revoke</button>
+            <button @click="returnBook(book.borrow_id, book.book_id)" type="button" class="btn btn-danger rounded-pill btn-sm me-1">revoke</button>
           </a>
-          <a
-            v-if="isLoggedIn & !isSuperUser"
-          >
-            <button @click="returnBook(book.borrow_id, book.book_id)" type="button" class="btn btn-dark rounded-pill btn-sm me-1">return</button>
+          <a v-if="isLoggedIn & !isSuperUser">
+            <button
+              @click="returnBook(book.borrow_id, book.book_id)"
+              type="button"
+              class="btn btn-dark rounded-pill btn-sm me-1"
+            >
+              return
+            </button>
           </a>
           <a
             :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.book_details.file}`"
@@ -105,73 +115,71 @@
       </li>
     </ul>
   </div>
-<br><br>
+  <br /><br />
 </template>
 
-<script>
+<script setup>
 import { useAuthStore } from '@/stores/auth'
-import { computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
+import { useRoute } from 'vue-router'
+// import { useToast } from 'vue-toast-notification'
 
-export default {
-  name: 'BookPage',
-  setup() {
-    const authStore = useAuthStore()
-    const isLoggedIn = computed(() => authStore.isLoggedIn)
-    const isSuperUser = computed(() => authStore.isSuperUser)
+const authStore = useAuthStore()
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isSuperUser = computed(() => authStore.isSuperUser)
+const route = useRoute()
+// const $toast = useToast()
 
-    return { isLoggedIn, isSuperUser }
-  },
-  data() {
-    return {
-      pending_requests: [],
-      borrowed_books: [],
-      returned_books: [],
-      user: JSON.parse(localStorage.getItem('user')) || null
-    }
-  },
-  methods: {
-    async getProfile() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/profile', {
-          headers: { 'x-access-token': this.user.token }
-        })
-        this.pending_requests = response.data.pending_requests
-        this.returned_books = response.data.returned_books
-        this.borrowed_books = response.data.borrowed_books
-      } catch (error) {
-        console.error('Error fetching UserProfile details', error)
-      }
-    },
-    async cancelRequest(request_id) {
-      try {
-        const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
-          headers: { 'x-access-token': this.user.token },
-          params: { 'request_id': request_id }
-        })
-        if(response.status === 200){
-          await this.getProfile()
-        }
-      } catch(error) {
-        console.error("Error canceling request", error)
-      }
-    },
-    async returnBook(borrow_id, book_id) {
-      try {
-        const response = await axios.get('http://localhost:5000/api/returnbook', {
-          headers: { 'x-access-token': this.user.token },
-          params: { 'borrow_id': borrow_id, 'book_id': book_id }
-        })
-        if(response.status === 200){
-          await this.getProfile()
-        }
-      } catch(error) {
-        console.error("Error returning book", error)
-      }
-    }
-  },
-  created() {
-    this.getProfile()
+const pending_requests = ref([])
+const borrowed_books = ref([])
+const returned_books = ref([])
+const user = JSON.parse(localStorage.getItem('user')) || null
+const user_id = ref('')
+
+const getProfile = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/profile', {
+      headers: { 'x-access-token': user.token },
+      params: { 'user_id': user_id.value}
+    })
+    pending_requests.value = response.data.pending_requests
+    returned_books.value = response.data.returned_books
+    borrowed_books.value = response.data.borrowed_books
+  } catch (error) {
+    console.error('Error fetching UserProfile details', error)
   }
 }
+
+const cancelRequest = async (request_id) => {
+  try {
+    const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
+      headers: { 'x-access-token': user.token },
+      params: { request_id: request_id }
+    })
+    if (response.status === 200) {
+      await getProfile()
+    }
+  } catch (error) {
+    console.error('Error canceling request', error)
+  }
+}
+
+const returnBook = async (borrow_id, book_id) => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/returnbook', {
+      headers: { 'x-access-token': user.token },
+      params: { borrow_id: borrow_id, book_id: book_id, user_id: user_id.value }
+    })
+    if (response.status === 200) {
+      await getProfile()
+    }
+  } catch (error) {
+    console.error('Error returning book', error)
+  }
+}
+
+onMounted(() => {
+  ;(user_id.value = route.params.user_id), getProfile()
+})
 </script>

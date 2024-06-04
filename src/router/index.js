@@ -44,7 +44,7 @@ const router = createRouter({
       component: () => import('@/components/SingleBookPage.vue')
     },
     {
-      path: '/profile',
+      path: '/profile/:user_id?',
       name: 'profile',
       component: () => import('@/components/ProfilePage.vue')
     },
