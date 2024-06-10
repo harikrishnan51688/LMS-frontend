@@ -61,11 +61,14 @@
         </div>
         <!-- <span class="badge bg-primary rounded-pill">$19.99</span> -->
         <div>
-          <a
-            v-if="isSuperUser"
-            href="#"
-          >
-            <button @click="returnBook(book.borrow_id, book.book_id)" type="button" class="btn btn-danger rounded-pill btn-sm me-1">revoke</button>
+          <a v-if="isSuperUser" href="#">
+            <button
+              @click="returnBook(book.borrow_id, book.book_id)"
+              type="button"
+              class="btn btn-danger rounded-pill btn-sm me-1"
+            >
+              revoke
+            </button>
           </a>
           <a v-if="isLoggedIn & !isSuperUser">
             <button
@@ -141,7 +144,7 @@ const getProfile = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/profile', {
       headers: { 'x-access-token': user.token },
-      params: { 'user_id': user_id.value}
+      params: { user_id: user_id.value }
     })
     pending_requests.value = response.data.pending_requests
     returned_books.value = response.data.returned_books
