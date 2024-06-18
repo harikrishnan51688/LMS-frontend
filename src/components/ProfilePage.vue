@@ -53,6 +53,17 @@
           <div>
             <h5 class="mt-0">{{ book.book_details.title }}</h5>
             {{ book.book_details.subtitle }}<br />
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                :id="'flexSwitchCheckDefault' + book.borrow_id"
+                v-model="book.auto_expiry"
+                @click="toggleExpiry(book.borrow_id)"
+              />
+              <label class="form-check-label" for="flexSwitchCheckDefault">Auto expiry</label>
+            </div>
             <span class="badge bg-secondary rounded-pill">Issued on: </span> {{ book.release_date
             }}<br />
             <span class="badge bg-secondary rounded-pill">Due date: </span> {{ book.due_date
@@ -126,13 +137,13 @@ import { useAuthStore } from '@/stores/auth'
 import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-// import { useToast } from 'vue-toast-notification'
+import { useToast } from 'vue-toast-notification'
 
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const isSuperUser = computed(() => authStore.isSuperUser)
 const route = useRoute()
-// const $toast = useToast()
+const $toast = useToast()
 
 const pending_requests = ref([])
 const borrowed_books = ref([])
@@ -179,6 +190,28 @@ const returnBook = async (borrow_id, book_id) => {
     }
   } catch (error) {
     console.error('Error returning book', error)
+  }
+}
+
+const toggleExpiry = async (borrow_id) => {
+  try{
+    console.log(borrow_id)
+    console.log(user)
+    const response = await axios.post('http://localhost:5000/api/toggle-expiry',
+      { borrow_id: borrow_id },
+      {
+        headers: { 'x-access-token': user.token }
+      })
+      if (response.status === 200) {
+        $toast.default(response.data.message, {
+            duration: 2000,
+            type: response.data.status,
+            position: 'top-right'
+          })
+          await getProfile()
+    }
+  } catch(error){
+    console.error("Error toggling expiry", error)
   }
 }
 

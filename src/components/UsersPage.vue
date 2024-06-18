@@ -12,7 +12,7 @@
                     <th>Current requests</th>
                     <th>Borrowed books</th>
                     <th>Returned books</th>
-                    <th>Is superuser</th>
+                    <th>Role</th>
                     
 
                 </tr>
@@ -27,8 +27,8 @@
                     <td>{{ user.request_count }}</td>
                     <td>{{ user.borrow_count }}</td>
                     <td>{{ user.return_count }}</td>
-                    <td>{{ user.is_superuser }}</td>
-                    <td v-if="!user.is_superuser">
+                    <td>{{ user.role }}</td>
+                    <td v-if="user.role !== 'admin'">
                     <a @click="removeUser(user.id)" class="remove-button">
                     <span class="badge bg-danger rounded-pill">Remove</span></a></td>
                     
