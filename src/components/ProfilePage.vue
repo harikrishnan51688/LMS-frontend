@@ -1,4 +1,16 @@
 <template>
+  <div class="position-absolute top-1 end-0 m-3">
+    <button @click="requestData()" type="button" class="btn btn-primary btn-sm me-1">
+      Export data
+    </button>
+    <a v-if="download_link" :href="`http://127.0.0.1:5000/static/${download_link}`">
+    <button type="button" class="btn btn-primary btn-sm">Download</button>
+    </a>
+    <a v-else>
+    <button v-if="task_id" @click="downloadData()" type="button" class="btn btn-primary btn-sm">Download</button>
+    </a>
+  </div>
+
   <div v-if="pending_requests.length > 0" class="container mt-4">
     <h2>Pending requests</h2>
     <ul class="list-group">
@@ -150,6 +162,9 @@ const borrowed_books = ref([])
 const returned_books = ref([])
 const user = JSON.parse(localStorage.getItem('user')) || null
 const user_id = ref('')
+const task_id = ref(localStorage.getItem('task_id') || null)
+const download_link = ref(null)
+
 
 const getProfile = async () => {
   try {
@@ -194,28 +209,80 @@ const returnBook = async (borrow_id, book_id) => {
 }
 
 const toggleExpiry = async (borrow_id) => {
-  try{
-    console.log(borrow_id)
-    console.log(user)
-    const response = await axios.post('http://localhost:5000/api/toggle-expiry',
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/api/toggle-expiry',
       { borrow_id: borrow_id },
       {
         headers: { 'x-access-token': user.token }
+      }
+    )
+    if (response.status === 200) {
+      $toast.default(response.data.message, {
+        duration: 2000,
+        type: response.data.status,
+        position: 'top-right'
       })
-      if (response.status === 200) {
-        $toast.default(response.data.message, {
-            duration: 2000,
-            type: response.data.status,
-            position: 'top-right'
-          })
-          await getProfile()
+      await getProfile()
     }
-  } catch(error){
-    console.error("Error toggling expiry", error)
+  } catch (error) {
+    console.error('Error toggling expiry', error)
   }
 }
+
+
+const requestData = async () => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/api/request-data',
+      {},
+      {
+        headers: { 'x-access-token': user.token }
+      }
+    )
+    if (response.status === 200) {
+      // task_id.value = response.data.task_id
+      localStorage.setItem('task_id', response.data.task_id)
+      downloadData()
+      $toast.default(response.data.message, {
+        duration: 2000,
+        type: response.data.status,
+        position: 'top-right'
+      })
+    }
+  } catch (error) {
+    console.error('Error requesting data', error)
+  }
+}
+
+const downloadData = async () => {
+  if (!task_id.value) return;
+  try {
+    const response = await axios.get('http://localhost:5000/api/download-data', {
+      headers: { 'x-access-token': user.token },
+      params: { 'task_id': task_id.value }
+    })
+    console.log(response.data)
+    if (response.data.status === 'success') {
+      download_link.value = response.data.path
+      // clearInterval(interval)
+    }
+    else if (response.data.status === 'info') {
+      $toast.default(response.data.message, {
+        duration: 2000,
+        type: response.data.status,
+        position: 'top-right'
+      })
+    }
+  } catch (error) {
+    console.error('Error requesting data', error)
+  }
+}
+
+// let interval = setInterval(downloadData, 2000)
 
 onMounted(() => {
   ;(user_id.value = route.params.user_id), getProfile()
 })
+
 </script>

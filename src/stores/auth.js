@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
       this.email = null
       this.is_superuser = false
       localStorage.removeItem('user')
+      localStorage.removeItem('task_id')
     },
     async login(email, password) {
       try {

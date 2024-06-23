@@ -67,9 +67,7 @@
         >
           <button class="btn btn-secondary me-1">Read</button>
         </a>
-        <a
-          v-if="!isSuperUser & !isBookBorrowed"
-        >
+        <a v-if="!isSuperUser & !isBookBorrowed">
           <button @click="requestBook(book.id)" class="btn btn-primary me-1">Request book</button>
         </a>
         <a
@@ -82,14 +80,55 @@
         </a>
       </div>
     </div>
+    <br />
+
+    <div class="rating-component">
+      <form @submit.prevent="submitRating(book.id)">
+        <div class="stars">
+          <span
+            v-for="star in 5"
+            :key="star"
+            class="star"
+            :class="{ filled: star <= rating }"
+            @click="setRating(star)"
+          >
+            ★
+          </span>
+        </div>
+        <textarea v-model="comment" placeholder="Leave a comment" required minlength="3"></textarea>
+        <div class="output">
+          <!-- <p>Rating: {{ rating }}</p> -->
+          <!-- <p>Comment: {{ comment }}</p> -->
+          <button type="submit" class="btn btn-primary" :disabled="rating === 0">Submit</button>
+        </div>
+      </form>
+
+      <div class="ratings-list" v-if="ratings.length > 0">
+        <h3>Ratings</h3>
+        <div v-for="(item, index) in ratings" :key="index" class="rating-item">
+          <small>{{item.user_name}} - {{item.created_at}}</small>
+          <div class="stars small-stars">
+            <span
+              v-for="star in 5"
+              :key="star"
+              class="star"
+              :class="{ filled: star <= item.rating }"
+            >
+              ★
+            </span>
+          </div>
+          <p>{{ item.comment }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { useAuthStore } from '@/stores/auth'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
-import {useToast} from 'vue-toast-notification';
+import { useToast } from 'vue-toast-notification'
 
 export default {
   name: 'BookPage',
@@ -97,16 +136,23 @@ export default {
     const authStore = useAuthStore()
     const isLoggedIn = computed(() => authStore.isLoggedIn)
     const isSuperUser = computed(() => authStore.isSuperUser)
-    const $toast = useToast();
+    const $toast = useToast()
+    const rating = ref(0)
+    const comment = ref('')
 
-    return { isLoggedIn, isSuperUser, $toast }
+    const setRating = (value) => {
+      rating.value = value
+    }
+
+    return { isLoggedIn, isSuperUser, $toast, rating, comment, setRating }
   },
   data() {
     return {
       id: null,
       book: [],
       user: JSON.parse(localStorage.getItem('user')) || null,
-      isBookBorrowed: false
+      isBookBorrowed: false,
+      ratings: []
     }
   },
   methods: {
@@ -135,16 +181,44 @@ export default {
       try {
         const response = await axios.get('http://localhost:5000/api/requestbook', {
           headers: { 'x-access-token': this.user.token },
-          params: { 'book_id': book_id }
+          params: { book_id: book_id }
         })
-        if(response.status === 200){
+        if (response.status === 200) {
           this.$toast.default(response.data.message, {
             duration: 2000,
             type: response.data.status
           })
         }
-      } catch(error) {
-        console.error("Error requesting book", error)
+      } catch (error) {
+        console.error('Error requesting book', error)
+      }
+    },
+    async submitRating(book_id) {
+      try {
+        const formdata = new FormData()
+        formdata.append('book_id', book_id)
+        formdata.append('rating', this.rating)
+        formdata.append('comment', this.comment)
+        const response = await axios.post('http://localhost:5000/api/submit-rating', formdata, {
+          headers: { 'x-access-token': this.user.token }
+        })
+        if (response.status === 200) {
+          this.comment = ''
+          this.rating = 0
+        }
+      } catch (error) {
+        console.error('Error rating book', error)
+      }
+    },
+    async getRatings() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/ratings', {
+          headers: { 'x-access-token': this.user.token },
+          params: { book_id: this.id }
+        })
+        this.ratings = response.data.ratings
+      } catch (error) {
+        console.error('Error fetching ratings', error)
       }
     }
   },
@@ -152,6 +226,69 @@ export default {
     this.id = this.$route.params.id
     this.getBook()
     this.isBorrowed()
+    this.getRatings()
   }
 }
 </script>
+
+<style scoped>
+.rating-component {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.stars {
+  display: flex;
+}
+
+.star {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #d3d3d3;
+}
+
+.small-stars .star {
+  font-size: 1rem;
+}
+
+.star.filled {
+  color: gold;
+}
+
+textarea {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 400px;
+  height: 100px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.output {
+  margin-top: 1rem;
+}
+
+.ratings-list {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.rating-item {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.rating-item .stars {
+  margin-bottom: 0.5rem;
+}
+
+.rating-item small {
+  display: block;
+  color: #666;
+}
+</style>
