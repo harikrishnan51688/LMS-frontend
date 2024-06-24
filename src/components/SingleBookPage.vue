@@ -106,7 +106,13 @@
       <div class="ratings-list" v-if="ratings.length > 0">
         <h3>Ratings</h3>
         <div v-for="(item, index) in ratings" :key="index" class="rating-item">
-          <small>{{item.user_name}} - {{item.created_at}}</small>
+          <small
+            >{{ item.user_name }} - {{ item.created_at }}
+            <a @click="deleteComment(item.id)" href="##">
+              <span v-if="isSuperUser" class="material-symbols-outlined">delete</span></a
+            ></small
+          >
+
           <div class="stars small-stars">
             <span
               v-for="star in 5"
@@ -205,6 +211,7 @@ export default {
         if (response.status === 200) {
           this.comment = ''
           this.rating = 0
+          await this.getRatings()
         }
       } catch (error) {
         console.error('Error rating book', error)
@@ -219,6 +226,20 @@ export default {
         this.ratings = response.data.ratings
       } catch (error) {
         console.error('Error fetching ratings', error)
+      }
+    },
+    async deleteComment(comment_id) {
+      try {
+        const response = await axios.delete('http://localhost:5000/api/delete-rating', {
+          headers: { 'x-access-token': this.user.token },
+          params: { comment_id: comment_id }
+        })
+        if (response.status === 200) {
+          await this.getRatings()
+        }
+        console.log(response.data)
+      } catch (error) {
+        console.error('Error deleting rating', error)
       }
     }
   },

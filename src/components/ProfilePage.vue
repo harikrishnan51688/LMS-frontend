@@ -6,9 +6,9 @@
     <a v-if="download_link" :href="`http://127.0.0.1:5000/static/${download_link}`">
     <button type="button" class="btn btn-primary btn-sm">Download</button>
     </a>
-    <a v-else>
+    <!-- <a v-else>
     <button v-if="task_id" @click="downloadData()" type="button" class="btn btn-primary btn-sm">Download</button>
-    </a>
+    </a> -->
   </div>
 
   <div v-if="pending_requests.length > 0" class="container mt-4">
@@ -164,6 +164,8 @@ const user = JSON.parse(localStorage.getItem('user')) || null
 const user_id = ref('')
 const task_id = ref(localStorage.getItem('task_id') || null)
 const download_link = ref(null)
+let alert = false
+let interval = null
 
 
 const getProfile = async () => {
@@ -240,49 +242,47 @@ const requestData = async () => {
         headers: { 'x-access-token': user.token }
       }
     )
-    if (response.status === 200) {
-      // task_id.value = response.data.task_id
+    console.log(response.data)
+    if (response.status === 200 && interval === null) {
       localStorage.setItem('task_id', response.data.task_id)
-      downloadData()
       $toast.default(response.data.message, {
         duration: 2000,
         type: response.data.status,
         position: 'top-right'
       })
+      alert = true
+      interval = setInterval(() => downloadData(response.data.task_id), 2000)
     }
   } catch (error) {
     console.error('Error requesting data', error)
   }
 }
 
-const downloadData = async () => {
-  if (!task_id.value) return;
+const downloadData = async (task_id) => {
   try {
     const response = await axios.get('http://localhost:5000/api/download-data', {
       headers: { 'x-access-token': user.token },
-      params: { 'task_id': task_id.value }
+      params: { 'task_id': task_id }
     })
-    console.log(response.data)
     if (response.data.status === 'success') {
       download_link.value = response.data.path
-      // clearInterval(interval)
-    }
-    else if (response.data.status === 'info') {
+      clearInterval(interval)
+      if (alert){
       $toast.default(response.data.message, {
         duration: 2000,
         type: response.data.status,
         position: 'top-right'
       })
     }
+    }
   } catch (error) {
     console.error('Error requesting data', error)
   }
 }
 
-// let interval = setInterval(downloadData, 2000)
 
 onMounted(() => {
-  ;(user_id.value = route.params.user_id), getProfile()
+  ;(user_id.value = route.params.user_id), getProfile(), downloadData(task_id.value)
 })
 
 </script>
