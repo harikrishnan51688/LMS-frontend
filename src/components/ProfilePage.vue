@@ -1,14 +1,25 @@
 <template>
   <div class="position-absolute top-1 end-0 m-3">
-    <button @click="requestData()" type="button" class="btn btn-primary btn-sm me-1">
+    <button
+      v-if="!isSuperUser"
+      @click="requestData()"
+      type="button"
+      class="btn btn-primary btn-sm me-1"
+    >
       Export data
     </button>
+    <button
+      v-if="isSuperUser"
+      type="button"
+      class="btn btn-primary btn-sm me-1"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      Grant book
+    </button>
     <a v-if="download_link" :href="`http://127.0.0.1:5000/static/${download_link}`">
-    <button type="button" class="btn btn-primary btn-sm">Download</button>
+      <button v-if="!isSuperUser" type="button" class="btn btn-primary btn-sm">Download</button>
     </a>
-    <!-- <a v-else>
-    <button v-if="task_id" @click="downloadData()" type="button" class="btn btn-primary btn-sm">Download</button>
-    </a> -->
   </div>
 
   <div v-if="pending_requests.length > 0" class="container mt-4">
@@ -142,6 +153,63 @@
     </ul>
   </div>
   <br /><br />
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Grant Book</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <input
+            v-model="searchQuery"
+            @input="handleInput"
+            class="form-control"
+            placeholder="Search..."
+          /><br />
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>price</th>
+                <th>action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="book in searchResults" :key="book.id">
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.price }}</td>
+                <td>
+                  <a href="#">
+                  <span @click="grantBook(book.id)" class="badge bg-success rounded-pill me-1">Grant</span>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -150,6 +218,7 @@ import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
+import { debounce } from 'lodash'
 
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn)
@@ -164,9 +233,10 @@ const user = JSON.parse(localStorage.getItem('user')) || null
 const user_id = ref('')
 const task_id = ref(localStorage.getItem('task_id') || null)
 const download_link = ref(null)
+const searchQuery = ref('')
+const searchResults = ref([])
 let alert = false
 let interval = null
-
 
 const getProfile = async () => {
   try {
@@ -232,7 +302,6 @@ const toggleExpiry = async (borrow_id) => {
   }
 }
 
-
 const requestData = async () => {
   try {
     const response = await axios.post(
@@ -262,27 +331,73 @@ const downloadData = async (task_id) => {
   try {
     const response = await axios.get('http://localhost:5000/api/download-data', {
       headers: { 'x-access-token': user.token },
-      params: { 'task_id': task_id }
+      params: { task_id: task_id }
     })
     if (response.data.status === 'success') {
       download_link.value = response.data.path
       clearInterval(interval)
-      if (alert){
-      $toast.default(response.data.message, {
-        duration: 2000,
-        type: response.data.status,
-        position: 'top-right'
-      })
-    }
+      if (alert) {
+        $toast.default(response.data.message, {
+          duration: 2000,
+          type: response.data.status,
+          position: 'top-right'
+        })
+      }
     }
   } catch (error) {
     console.error('Error requesting data', error)
   }
 }
 
+const fetchResult = async (query) => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/search', {
+      params: {
+        query: query
+      }
+    })
+    searchResults.value = response.data.book
+  } catch (error) {
+    console.log('Error fetching search results', error)
+  }
+}
 
+const debounceFetch = debounce((query) => {
+  fetchResult(query)
+}, 300)
+
+const handleInput = () => {
+  if (searchQuery.value) {
+    debounceFetch(searchQuery.value)
+  } else {
+    searchResults.value = []
+  }
+}
+
+const grantBook = async (book_id) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/grant-book',
+      {
+        book_id: book_id,
+        user_id: user_id.value
+      },
+      {
+        headers: { 'x-access-token': user.token }
+      }
+    )
+    if (response.status === 200){
+      $toast.default(response.data.message, {
+          duration: 2000,
+          type: response.data.status,
+          position: 'top-right'
+        })
+        await getProfile()
+    }
+  } catch(error){
+    console.error("Error granting book", error)
+  }
+}
 onMounted(() => {
   ;(user_id.value = route.params.user_id), getProfile(), downloadData(task_id.value)
 })
-
 </script>
