@@ -130,10 +130,10 @@ const router = createRouter({
 })
 
 // for superuser routes
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  await authStore.checkAuth()
   const isSuperUser = computed(() => authStore.isSuperUser)
-
   if (to.matched.some((record) => record.meta.isSuperUser)) {
     if (isSuperUser.value) {
       next()

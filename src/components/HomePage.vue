@@ -79,11 +79,26 @@ export default {
     }
   },
   methods: {
+    showLoader() {
+      let loader = this.$loading.show({
+        // Optional parameters
+        container: this.fullPage ? null : this.$refs.formContainer,
+        canCancel: true,
+        onCancel: this.onCancel,
+        width: 30,
+        height: 35,
+        color: 'blue'
+      })
+      return loader
+    },
+
     async getBooks() {
       try {
+        let loader = this.showLoader()
         const response = await axios.get('http://localhost:5000/api/books')
         this.books = response.data.books
         this.allBooks = response.data.books
+        loader.hide()
       } catch (error) {
         console.error("Error fetching books:", error)
       }

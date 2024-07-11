@@ -162,10 +162,25 @@ export default {
     }
   },
   methods: {
+    showLoader() {
+      let loader = this.$loading.show({
+        // Optional parameters
+        container: this.fullPage ? null : this.$refs.formContainer,
+        canCancel: true,
+        onCancel: this.onCancel,
+        width: 30,
+        height: 35,
+        color: 'blue'
+      })
+      return loader
+    },
+
     async getBook() {
       try {
+        let loader = this.showLoader()
         const response = await axios.get(`http://localhost:5000/api/book/${this.id}`)
         this.book = response.data.book
+        loader.hide()
       } catch (error) {
         console.log('Error fetching book', error)
       }
@@ -201,6 +216,7 @@ export default {
     },
     async submitRating(book_id) {
       try {
+        let loader = this.showLoader()
         const formdata = new FormData()
         formdata.append('book_id', book_id)
         formdata.append('rating', this.rating)
@@ -211,6 +227,7 @@ export default {
         if (response.status === 200) {
           this.comment = ''
           this.rating = 0
+          loader.hide()
           await this.getRatings()
         }
       } catch (error) {

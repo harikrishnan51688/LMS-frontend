@@ -113,6 +113,18 @@ export default {
     }
   },
   methods: {
+    showLoader() {
+      let loader = this.$loading.show({
+        // Optional parameters
+        container: this.fullPage ? null : this.$refs.formContainer,
+        canCancel: true,
+        onCancel: this.onCancel,
+        width: 30,
+        height: 35,
+        color: 'blue'
+      })
+      return loader
+    },
     getRecentlyAddedBooks() {
       const path = 'http://localhost:5000/api/books'
       axios
@@ -128,6 +140,7 @@ export default {
       return books.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4)
     },
     getSections() {
+      let loader = this.showLoader()
       const path = 'http://localhost:5000/api/sections'
       axios
         .get(path)
@@ -137,6 +150,7 @@ export default {
         .catch((error) => {
           console.error(error)
         })
+        loader.hide()
     },
     async handleSearch() {
       await searchBooks(

@@ -214,7 +214,7 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, inject } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
@@ -237,6 +237,13 @@ const searchQuery = ref('')
 const searchResults = ref([])
 let alert = false
 let interval = null
+const $loading =  inject('$loading')
+
+const loader = $loading.show({
+    width: 30,
+    height: 35,
+    color: 'blue'
+    });
 
 const getProfile = async () => {
   try {
@@ -247,6 +254,7 @@ const getProfile = async () => {
     pending_requests.value = response.data.pending_requests
     returned_books.value = response.data.returned_books
     borrowed_books.value = response.data.borrowed_books
+    loader.hide()
   } catch (error) {
     console.error('Error fetching UserProfile details', error)
   }
@@ -281,6 +289,11 @@ const returnBook = async (borrow_id, book_id) => {
 }
 
 const toggleExpiry = async (borrow_id) => {
+  const loader = $loading.show({
+  width: 30,
+  height: 35,
+  color: 'blue'
+  });
   try {
     const response = await axios.post(
       'http://localhost:5000/api/toggle-expiry',
@@ -296,6 +309,7 @@ const toggleExpiry = async (borrow_id) => {
         position: 'top-right'
       })
       await getProfile()
+      loader.hide()
     }
   } catch (error) {
     console.error('Error toggling expiry', error)

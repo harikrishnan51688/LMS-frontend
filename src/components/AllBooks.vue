@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import axios from 'axios'
 import Sidebar from '@/components/SidebarLine.vue'
 import { useToast } from 'vue-toast-notification'
@@ -124,12 +124,19 @@ const form = ref({
       'file' : null,
       'image' : null,
 })
+const $loading =  inject('$loading')
 
+const loader = $loading.show({
+    width: 30,
+    height: 35,
+    color: 'blue'
+    });
 
 const getBooks = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/books')
     allbooks.value = response.data.books
+    loader.hide()
   } catch (error) {
     console.error('Error fetching books data', error)
   }

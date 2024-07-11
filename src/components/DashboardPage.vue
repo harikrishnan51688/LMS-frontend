@@ -83,7 +83,7 @@
 
 <script setup>
 import Sidebar from '@/components/SidebarLine.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import axios from 'axios'
 import { Chart } from 'chart.js/auto'
 
@@ -95,6 +95,13 @@ const total_sections = ref(null)
 const total_users = ref(null)
 
 const user = JSON.parse(localStorage.getItem('user')) || null
+const $loading =  inject('$loading')
+
+const loader = $loading.show({
+    width: 30,
+    height: 35,
+    color: 'blue'
+    });
 
 const getStats = async () => {
   try {
@@ -108,6 +115,7 @@ const getStats = async () => {
     total_requests.value = data.total_requests
     current_borrowed.value = data.current_borrowed
     total_returned.value = data.total_returned
+    loader.hide()
   } catch (error) {
     console.error('Error fetching stats', error)
   }

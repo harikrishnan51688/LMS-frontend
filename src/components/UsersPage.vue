@@ -40,13 +40,20 @@
 
 <script setup>
 import Sidebar from '@/components/SidebarLine.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import axios from 'axios'
 import {useToast} from 'vue-toast-notification'
 
 const user = JSON.parse(localStorage.getItem('user')) || null
 const $toast = useToast()
 const allusers = ref([])
+const $loading =  inject('$loading')
+
+const loader = $loading.show({
+    width: 30,
+    height: 35,
+    color: 'blue'
+    });
 
 const getusers = async () => {
   try {
@@ -54,6 +61,7 @@ const getusers = async () => {
       headers: { 'x-access-token': user.token }
     })
     allusers.value = response.data.user_data
+    loader.hide()
   } catch (error) {
     console.error('Error fetching users data', error)
   }
