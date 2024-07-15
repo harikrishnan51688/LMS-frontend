@@ -85,6 +85,28 @@ import EbookSection from './BookSectionRow.vue'
         </div>
       </div>
 
+      <div class="col-lg-12">
+        <h2 class="mt-4">Top Ratings</h2>
+        <hr class="short-hr" />
+      </div>
+      <!-- Book Cards Section -->
+      <div v-for="book in basedOnRatings" :key="book.id" class="col-lg-3 col-md-6 mb-4">
+        <div>
+          <router-link :to="{ name: 'book', params: { id: book.id } }">
+            <img
+              class="card-img-top img-fluid"
+              style="width: 200px; height: 300px"
+              :src="`http://127.0.0.1:5000/static/${book.image}`"
+              alt="Book Image 1"
+            />
+            <div class="card-body">
+              <h4 class="card-title">{{ book.title }}</h4>
+              <p class="card-text">{{ book.subtitle }}</p>
+            </div>
+          </router-link>
+        </div>
+      </div>
+
       <div v-for="section in sections" :key="section.section_id" class="row">
         <div v-if="section.book_count > 0" class="col-lg-12">
           <h2 class="mt-4">{{ section.section_name }}</h2>
@@ -106,6 +128,7 @@ export default {
   data() {
     return {
       recently_added: [],
+      basedOnRatings: [],
       sections: [],
       isSearching: false,
       searchQuery: '',
@@ -131,6 +154,7 @@ export default {
         .get(path)
         .then((res) => {
           this.recently_added = this.sortAndLimitBooks(res.data.books)
+          this.basedOnRatings = res.data.basedOnRatings
         })
         .catch((error) => {
           console.error(error)

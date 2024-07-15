@@ -1,7 +1,3 @@
-<!-- <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script> -->
-
 <template>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">

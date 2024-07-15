@@ -1,7 +1,7 @@
 <template>
   <div class="position-absolute top-1 end-0 m-3">
     <button
-      v-if="!isSuperUser"
+      v-if="!isSuperUser && !isEmpty"
       @click="requestData()"
       type="button"
       class="btn btn-primary btn-sm me-1"
@@ -20,6 +20,10 @@
     <a v-if="download_link" :href="`http://127.0.0.1:5000/static/${download_link}`">
       <button v-if="!isSuperUser" type="button" class="btn btn-primary btn-sm">Download</button>
     </a>
+  </div>
+
+  <div v-if="isEmpty">
+    <h3>No data available!</h3>
   </div>
 
   <div v-if="pending_requests.length > 0" class="container mt-4">
@@ -196,7 +200,9 @@
                 <td>{{ book.price }}</td>
                 <td>
                   <a href="#">
-                  <span @click="grantBook(book.id)" class="badge bg-success rounded-pill me-1">Grant</span>
+                    <span @click="grantBook(book.id)" class="badge bg-success rounded-pill me-1"
+                      >Grant</span
+                    >
                   </a>
                 </td>
               </tr>
@@ -237,13 +243,13 @@ const searchQuery = ref('')
 const searchResults = ref([])
 let alert = false
 let interval = null
-const $loading =  inject('$loading')
+const $loading = inject('$loading')
 
 const loader = $loading.show({
-    width: 30,
-    height: 35,
-    color: 'blue'
-    });
+  width: 30,
+  height: 35,
+  color: 'blue'
+})
 
 const getProfile = async () => {
   try {
@@ -290,10 +296,10 @@ const returnBook = async (borrow_id, book_id) => {
 
 const toggleExpiry = async (borrow_id) => {
   const loader = $loading.show({
-  width: 30,
-  height: 35,
-  color: 'blue'
-  });
+    width: 30,
+    height: 35,
+    color: 'blue'
+  })
   try {
     const response = await axios.post(
       'http://localhost:5000/api/toggle-expiry',
@@ -390,7 +396,8 @@ const handleInput = () => {
 
 const grantBook = async (book_id) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/grant-book',
+    const response = await axios.post(
+      'http://localhost:5000/api/grant-book',
       {
         book_id: book_id,
         user_id: user_id.value
@@ -399,18 +406,26 @@ const grantBook = async (book_id) => {
         headers: { 'x-access-token': user.token }
       }
     )
-    if (response.status === 200){
+    if (response.status === 200) {
       $toast.default(response.data.message, {
-          duration: 2000,
-          type: response.data.status,
-          position: 'top-right'
-        })
-        await getProfile()
+        duration: 2000,
+        type: response.data.status,
+        position: 'top-right'
+      })
+      await getProfile()
     }
-  } catch(error){
-    console.error("Error granting book", error)
+  } catch (error) {
+    console.error('Error granting book', error)
   }
 }
+
+const isEmpty = computed(() => {
+  return (
+    pending_requests.value.length === 0 &&
+    borrowed_books.value.length === 0 &&
+    returned_books.value.length === 0
+  )
+})
 onMounted(() => {
   ;(user_id.value = route.params.user_id), getProfile(), downloadData(task_id.value)
 })

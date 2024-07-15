@@ -4,11 +4,33 @@
   <div class="container mt-5">
     <div class="d-flex align-items-center">
       <h2>Section: {{ section.section_name }}&nbsp;</h2>
-      <!-- <a href="{{ url_for('edit_section', section_id=section.section_id) }}"> -->
-      <!-- <img src = "{{ url_for('static', filename='uploads/edit.svg')}}" alt="My Happy SVG"/> -->
-      <!-- </a> -->
+      <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <img :src="`http://127.0.0.1:5000/static/uploads/edit.svg`" alt="My Happy SVG"/>
+      </a>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">{{ section.section_name }}</label>
+              <input v-model="section_name" type="email" class="form-control" id="exampleFormControlInput1">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button @click="updateSection(section.section_id)" type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- <a class="btn btn-primary" href="{{ url_for('books', section_id=section.section_id) }}">Add book</a> -->
+
+    </div>
     <table class="table">
       <thead>
         <tr>
@@ -40,11 +62,7 @@
   <div class="container mt-5">
     <div class="d-flex align-items-center">
       <h2>Add Book:</h2>
-      <!-- <a href="{{ url_for('edit_section', section_id=section.section_id) }}"> -->
-      <!-- <img src = "{{ url_for('static', filename='uploads/edit.svg')}}" alt="My Happy SVG"/> -->
-      <!-- </a> -->
     </div>
-    <!-- <a class="btn btn-primary" href="{{ url_for('books', section_id=section.section_id) }}">Add book</a> -->
     <table class="table">
       <thead>
         <tr>
@@ -55,7 +73,6 @@
         </tr>
       </thead>
       <tbody>
-        <!-- {% for book in ebooks %} -->
         <tr v-for="book in remaining_books.books" :key="book.id">
           <td>{{ book.id }}</td>
           <td>{{ book.title }}</td>
@@ -69,7 +86,6 @@
             </a>
           </td>
         </tr>
-        <!-- {% endfor %} -->
       </tbody>
     </table>
   </div>
@@ -89,6 +105,7 @@ const user = JSON.parse(localStorage.getItem('user')) || null
 const section_id = ref('')
 const section = ref({})
 const remaining_books = ref({})
+const section_name = ref(null)
 
 const getSection = async () => {
   try {
@@ -146,6 +163,25 @@ const removeBookFromSection = async (book_id) => {
   } catch (error) {
     console.error('Error removing book from section', error)
   }
+}
+
+const updateSection = async (section_id) => {
+  try{
+    const formdata = new FormData()
+    formdata.append('section_name', section_name.value)
+    const response = await axios.put(`http://127.0.0.1:5000/api/update-section/${section_id}`, formdata, {
+      headers: { 'x-access-token': user.token },
+  })
+  if (response.status === 200){
+    $toast.default(response.data.message, {
+        duration: 2000,
+        type: response.data.status
+      })
+      getSection()
+  } 
+} catch (error) {
+  console.error('Error update section name', error)
+}
 }
 
 onMounted(() => {

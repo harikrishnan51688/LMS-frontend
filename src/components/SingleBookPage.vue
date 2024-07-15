@@ -52,7 +52,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                   Close
                 </button>
-                <a href="{{ url_for('static', filename=book.file) }}"
+                <a :href="`http://127.0.0.1:5000/static/${book.file}`"
                   ><button type="button" class="btn btn-primary">Buy it</button></a
                 >
               </div>
@@ -104,7 +104,7 @@
       </form>
 
       <div class="ratings-list" v-if="ratings.length > 0">
-        <h3>Ratings</h3>
+        <h3>Ratings</h3><p>Average: {{ book.avg_rating }}</p>
         <div v-for="(item, index) in ratings" :key="index" class="rating-item">
           <small
             >{{ item.user_name }} - {{ item.created_at }}
@@ -128,6 +128,22 @@
       </div>
     </div>
   </div>
+
+  <div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+          <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2024 Library @iitm</span>
+      </div>
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+      </ul>
+    </footer>
+</div>
 </template>
 
 <script>
@@ -199,6 +215,9 @@ export default {
       }
     },
     async requestBook(book_id) {
+      if (!this.isLoggedIn) {
+        this.$router.push('/login')
+      }
       try {
         const response = await axios.get('http://localhost:5000/api/requestbook', {
           headers: { 'x-access-token': this.user.token },
@@ -215,23 +234,27 @@ export default {
       }
     },
     async submitRating(book_id) {
-      try {
-        let loader = this.showLoader()
-        const formdata = new FormData()
-        formdata.append('book_id', book_id)
-        formdata.append('rating', this.rating)
-        formdata.append('comment', this.comment)
-        const response = await axios.post('http://localhost:5000/api/submit-rating', formdata, {
-          headers: { 'x-access-token': this.user.token }
-        })
-        if (response.status === 200) {
-          this.comment = ''
-          this.rating = 0
+      if (!this.isLoggedIn) {
+        this.$router.push('/login')
+      } else {
+        try {
+          let loader = this.showLoader()
+          const formdata = new FormData()
+          formdata.append('book_id', book_id)
+          formdata.append('rating', this.rating)
+          formdata.append('comment', this.comment)
+          const response = await axios.post('http://localhost:5000/api/submit-rating', formdata, {
+            headers: { 'x-access-token': this.user.token }
+          })
           loader.hide()
-          await this.getRatings()
+          if (response.status === 200) {
+            this.comment = ''
+            this.rating = 0
+            await this.getRatings()
+          }
+        } catch (error) {
+          console.error('Error rating book', error)
         }
-      } catch (error) {
-        console.error('Error rating book', error)
       }
     },
     async getRatings() {

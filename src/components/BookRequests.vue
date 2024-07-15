@@ -45,13 +45,20 @@
 
 <script setup>
 import Sidebar from '@/components/SidebarLine.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import axios from 'axios'
 import { useToast } from 'vue-toast-notification'
 
 const $toast = useToast()
 const user = JSON.parse(localStorage.getItem('user')) || null
 const requests = ref([])
+const $loading = inject('$loading')
+
+const loader = $loading.show({
+  width: 30,
+  height: 35,
+  color: 'blue'
+})
 
 const getrequests = async () => {
   try {
@@ -59,6 +66,7 @@ const getrequests = async () => {
       headers: { 'x-access-token': user.token }
     })
     requests.value = response.data.requests
+    loader.hide()
   } catch (error) {
     console.error('Error fetching user requests', error)
   }
