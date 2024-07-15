@@ -203,7 +203,7 @@ export default {
     },
     async isBorrowed() {
       try {
-        const response = await axios.get('http://localhost:5000/api/isborrowed', {
+        const response = await axios.get('http://localhost:5000/api/profile/isborrowed', {
           headers: { 'x-access-token': `${this.user.token}` },
           params: {
             book_id: this.id
@@ -219,7 +219,7 @@ export default {
         this.$router.push('/login')
       }
       try {
-        const response = await axios.get('http://localhost:5000/api/requestbook', {
+        const response = await axios.get('http://localhost:5000/api/profile/requestbook', {
           headers: { 'x-access-token': this.user.token },
           params: { book_id: book_id }
         })
@@ -243,7 +243,7 @@ export default {
           formdata.append('book_id', book_id)
           formdata.append('rating', this.rating)
           formdata.append('comment', this.comment)
-          const response = await axios.post('http://localhost:5000/api/submit-rating', formdata, {
+          const response = await axios.post('http://localhost:5000/api/book/submit-rating', formdata, {
             headers: { 'x-access-token': this.user.token }
           })
           loader.hide()
@@ -259,7 +259,7 @@ export default {
     },
     async getRatings() {
       try {
-        const response = await axios.get('http://localhost:5000/api/ratings', {
+        const response = await axios.get('http://localhost:5000/api/book/ratings', {
           headers: { 'x-access-token': this.user.token },
           params: { book_id: this.id }
         })
@@ -270,7 +270,7 @@ export default {
     },
     async deleteComment(comment_id) {
       try {
-        const response = await axios.delete('http://localhost:5000/api/delete-rating', {
+        const response = await axios.delete('http://localhost:5000/api/book/delete-rating', {
           headers: { 'x-access-token': this.user.token },
           params: { comment_id: comment_id }
         })

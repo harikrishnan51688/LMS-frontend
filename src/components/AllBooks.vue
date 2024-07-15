@@ -134,7 +134,7 @@ const loader = $loading.show({
 
 const getBooks = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/books')
+    const response = await axios.get('http://localhost:5000/api/book/all')
     allbooks.value = response.data.books
     loader.hide()
   } catch (error) {
@@ -179,7 +179,7 @@ const updateBook = async () => {
     if (form.value.image){
       formdata.append('image', form.value.image)
     }
-    const response = await axios.put(`http://localhost:5000/api/update-book/${form.value.id}`, formdata, {
+    const response = await axios.put(`http://localhost:5000/api/book/update-book/${form.value.id}`, formdata, {
       headers: { 'x-access-token': user.token },
       'Content-Type': 'multipart/form-data',
     })
@@ -209,7 +209,7 @@ const handleFileUpload = (event, type) => {
 
 const removeBook = async (book_id) => {
   try {
-    const response = await axios.delete('http://localhost:5000/api/delete-book', {
+    const response = await axios.delete('http://localhost:5000/api/book/delete-book', {
       headers: { 'x-access-token': user.token },
       params: { book_id: book_id }
     })

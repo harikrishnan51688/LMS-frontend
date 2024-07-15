@@ -268,11 +268,16 @@ const getProfile = async () => {
 
 const cancelRequest = async (request_id) => {
   try {
-    const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
+    const response = await axios.delete('http://localhost:5000/api/admin/cancelrequest', {
       headers: { 'x-access-token': user.token },
       params: { request_id: request_id }
     })
     if (response.status === 200) {
+      $toast.default(response.data.message, {
+        duration: 2000,
+        type: response.data.status,
+        position: 'top-right'
+      })
       await getProfile()
     }
   } catch (error) {
@@ -282,7 +287,7 @@ const cancelRequest = async (request_id) => {
 
 const returnBook = async (borrow_id, book_id) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/returnbook', {
+    const response = await axios.get('http://localhost:5000/api/profile/returnbook', {
       headers: { 'x-access-token': user.token },
       params: { borrow_id: borrow_id, book_id: book_id, user_id: user_id.value }
     })
@@ -302,7 +307,7 @@ const toggleExpiry = async (borrow_id) => {
   })
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/toggle-expiry',
+      'http://localhost:5000/api/profile/toggle-expiry',
       { borrow_id: borrow_id },
       {
         headers: { 'x-access-token': user.token }
@@ -325,7 +330,7 @@ const toggleExpiry = async (borrow_id) => {
 const requestData = async () => {
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/request-data',
+      'http://localhost:5000/api/profile/request-data',
       {},
       {
         headers: { 'x-access-token': user.token }
@@ -349,7 +354,7 @@ const requestData = async () => {
 
 const downloadData = async (task_id) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/download-data', {
+    const response = await axios.get('http://localhost:5000/api/profile/download-data', {
       headers: { 'x-access-token': user.token },
       params: { task_id: task_id }
     })
@@ -397,7 +402,7 @@ const handleInput = () => {
 const grantBook = async (book_id) => {
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/grant-book',
+      'http://localhost:5000/api/admin/grant-book',
       {
         book_id: book_id,
         user_id: user_id.value

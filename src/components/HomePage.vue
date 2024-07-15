@@ -51,7 +51,7 @@
             />
             <div class="card-body">
               <h4 class="card-title">{{ book.title }}</h4>
-              <p class="card-text">{{ book.subtitle }}</p>
+              <p class="card-text">{{ truncateText(book.subtitle, 28) }}...</p>
             </div>
           </router-link>
         </div>
@@ -62,6 +62,7 @@
 
 <script>
 import axios from 'axios'
+import truncate from 'truncate-utf8-bytes';
 
 export default {
   name: 'HomePage',
@@ -95,7 +96,7 @@ export default {
     async getBooks() {
       try {
         let loader = this.showLoader()
-        const response = await axios.get('http://localhost:5000/api/books')
+        const response = await axios.get('http://localhost:5000/api/book/all')
         this.books = response.data.books
         this.allBooks = response.data.books
         loader.hide()
@@ -121,6 +122,10 @@ export default {
       } catch (error) {
         console.log("Error fetching search query:", error)
       }
+    },
+
+    truncateText(text, size){
+      return truncate(text, size)
     }
   },
   created() {

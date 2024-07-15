@@ -57,7 +57,7 @@ const loader = $loading.show({
 
 const getusers = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/allusers', {
+    const response = await axios.get('http://localhost:5000/api/admin/allusers', {
       headers: { 'x-access-token': user.token }
     })
     allusers.value = response.data.user_data
@@ -69,7 +69,7 @@ const getusers = async () => {
 
 const removeUser = async (user_id) => {
   try {
-    const response = await axios.delete('http://localhost:5000/api/removeuser', {
+    const response = await axios.delete('http://localhost:5000/api/admin/removeuser', {
       headers: { 'x-access-token': user.token },
       params: {'user_id': user_id}
     })

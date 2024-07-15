@@ -79,7 +79,7 @@ import EbookSection from './BookSectionRow.vue'
             />
             <div class="card-body">
               <h4 class="card-title">{{ book.title }}</h4>
-              <p class="card-text">{{ book.subtitle }}</p>
+              <p class="card-text">{{ truncateText(book.subtitle, 28) }}...</p>
             </div>
           </router-link>
         </div>
@@ -101,7 +101,7 @@ import EbookSection from './BookSectionRow.vue'
             />
             <div class="card-body">
               <h4 class="card-title">{{ book.title }}</h4>
-              <p class="card-text">{{ book.subtitle }}</p>
+              <p class="card-text">{{ truncateText(book.subtitle, 28) }}...</p>
             </div>
           </router-link>
         </div>
@@ -122,6 +122,7 @@ import EbookSection from './BookSectionRow.vue'
 <script>
 import axios from 'axios'
 import { searchBooks } from '@/utils/searchBooks'
+import truncate from 'truncate-utf8-bytes';
 
 export default {
   name: 'HomePage',
@@ -149,7 +150,7 @@ export default {
       return loader
     },
     getRecentlyAddedBooks() {
-      const path = 'http://localhost:5000/api/books'
+      const path = 'http://localhost:5000/api/book/all'
       axios
         .get(path)
         .then((res) => {
@@ -165,7 +166,7 @@ export default {
     },
     getSections() {
       let loader = this.showLoader()
-      const path = 'http://localhost:5000/api/sections'
+      const path = 'http://localhost:5000/api/section/all'
       axios
         .get(path)
         .then((res) => {
@@ -182,6 +183,9 @@ export default {
         (books) => (this.books = books),
         (isSearching) => (this.isSearching = isSearching)
       )
+    },
+    truncateText(text, size){
+      return truncate(text, size)
     }
   },
   created() {

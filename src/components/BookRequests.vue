@@ -62,7 +62,7 @@ const loader = $loading.show({
 
 const getrequests = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/book-requests', {
+    const response = await axios.get('http://localhost:5000/api/admin/book-requests', {
       headers: { 'x-access-token': user.token }
     })
     requests.value = response.data.requests
@@ -74,7 +74,7 @@ const getrequests = async () => {
 
 const approveRequest = async (request_id) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/approve-request', {
+    const response = await axios.get('http://localhost:5000/api/admin/approve-request', {
       headers: { 'x-access-token': user.token },
       params: { request_id: request_id }
     })
@@ -92,7 +92,7 @@ const approveRequest = async (request_id) => {
 
 const cancelRequest = async (request_id) => {
   try {
-    const response = await axios.delete('http://localhost:5000/api/cancelrequest', {
+    const response = await axios.delete('http://localhost:5000/api/admin/cancelrequest', {
       headers: { 'x-access-token': user.token },
       params: { request_id: request_id }
     })

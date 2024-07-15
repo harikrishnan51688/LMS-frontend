@@ -87,7 +87,7 @@ const addbook = async() => {
     formdata.append('price', price.value)
     formdata.append('file', file.value)
     formdata.append('image', image.value)
-    const response = await axios.post('http://127.0.0.1:5000/api/add-book', formdata, {
+    const response = await axios.post('http://localhost:5000/api/book/add-book', formdata, {
       headers: { 'x-access-token': user.token },
       'Content-Type': 'multipart/form-data',
     })

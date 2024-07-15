@@ -109,7 +109,7 @@ const section_name = ref(null)
 
 const getSection = async () => {
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/api/sections/${section_id.value}`)
+    const response = await axios.get(`http://localhost:5000/api/section/${section_id.value}`)
     section.value = response.data
   } catch (error) {
     console.error('Error fetching sections', error)
@@ -118,7 +118,7 @@ const getSection = async () => {
 
 const bookNotInSection = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:5000/api/section/remaining-books', {
+    const response = await axios.get('http://localhost:5000/api/section/remaining-books', {
       params: { section_id: section_id.value }
     })
     remaining_books.value = response.data
@@ -129,7 +129,7 @@ const bookNotInSection = async () => {
 
 const addBookToSection = async (book_id) => {
   try {
-    const response = await axios.get('http://127.0.0.1:5000/api/section/add-book', {
+    const response = await axios.get('http://localhost:5000/api/section/add-book', {
       headers: { 'x-access-token': user.token },
       params: { section_id: section_id.value, book_id: book_id }
     })
@@ -148,7 +148,7 @@ const addBookToSection = async (book_id) => {
 
 const removeBookFromSection = async (book_id) => {
   try {
-    const response = await axios.delete('http://127.0.0.1:5000/api/section/remove-book', {
+    const response = await axios.delete('http://localhost:5000/api/section/remove-book', {
       headers: { 'x-access-token': user.token },
       params: { section_id: section_id.value, book_id: book_id }
     })
@@ -169,7 +169,7 @@ const updateSection = async (section_id) => {
   try{
     const formdata = new FormData()
     formdata.append('section_name', section_name.value)
-    const response = await axios.put(`http://127.0.0.1:5000/api/update-section/${section_id}`, formdata, {
+    const response = await axios.put(`http://localhost:5000/api/section/update-section/${section_id}`, formdata, {
       headers: { 'x-access-token': user.token },
   })
   if (response.status === 200){

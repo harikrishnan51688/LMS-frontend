@@ -47,7 +47,7 @@ const user = JSON.parse(localStorage.getItem('user')) || null
 
 const getSections = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:5000/api/sections')
+    const response = await axios.get('http://localhost:5000/api/section/all')
     sections.value = response.data.sections
   } catch (error) {
     console.error('Error fetching sections', error)
@@ -57,7 +57,7 @@ const getSections = async () => {
 const removeSection = async (section_id) => {
   try {
     console.log(section_id)
-    const response = await axios.delete(`http://127.0.0.1:5000/api/delete-section/${section_id}`, {
+    const response = await axios.delete(`http://localhost:5000/api/section/delete-section/${section_id}`, {
       headers: { 'x-access-token': user.token }
     })
     if (response.status === 200) {

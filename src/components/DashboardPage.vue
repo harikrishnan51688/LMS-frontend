@@ -114,7 +114,7 @@ const loader = $loading.show({
 
 const getStats = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/stats', {
+    const response = await axios.get('http://localhost:5000/api/admin/stats', {
       headers: { 'x-access-token': user.token }
     })
     const data = response.data.data
@@ -132,7 +132,7 @@ const getStats = async () => {
 }
 
 const createSectionChart = () => {
-  fetch('http://127.0.0.1:5000/api/chart/sections')
+  fetch('http://localhost:5000/api/chart/sections')
     .then((response) => response.json())
     .then((data) => {
       var ctx = document.getElementById('sections')
@@ -148,7 +148,7 @@ const createSectionChart = () => {
 }
 
 const createUserChart = () => {
-  fetch('http://127.0.0.1:5000/api/chart/users')
+  fetch('http://localhost:5000/api/chart/users')
     .then((response) => response.json())
     .then((data) => {
       var ctx = document.getElementById('users')

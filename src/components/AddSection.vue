@@ -45,7 +45,7 @@ const addSection = async () => {
     const formdata = new FormData()
     formdata.append('section_name', sectionName.value)
 
-    const response = await axios.post('http://127.0.0.1:5000/api/add-section', formdata, {
+    const response = await axios.post('http://localhost:5000/api/section/add-section', formdata, {
       headers: { 'x-access-token': user.token }
     })
     if (response.status === 200) {
