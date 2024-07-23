@@ -4,11 +4,7 @@
 
     <div class="row">
       <div class="col-md-3">
-        <img
-          :src="`http://127.0.0.1:5000/static/${book.image}`"
-          alt="Book Cover"
-          class="img-fluid"
-        />
+        <img :src="`http://127.0.0.1:5000/static/${book.image}`" alt="Book Cover" class="img-fluid" />
       </div>
       <div class="col-md-6">
         <h4 class="mb-3">Details</h4>
@@ -18,66 +14,80 @@
         <p><strong>Description:</strong> {{ book.subtitle }}</p>
         <p><strong>Price:</strong> ₹{{ book.price }}</p>
 
-        <button
-          v-if="isLoggedIn"
-          type="button"
-          class="btn btn-primary me-1"
-          data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
-        >
-          Buy
-        </button>
-        <div
-          class="modal fade"
-          id="exampleModal"
-          tabindex="-1"
-          aria-labelledby="exampleModalLabel"
-          aria-hidden="true"
-        >
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Buy</h1>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
-                Purchase this book "{{ book.title }}" at ₹{{ book.price }}?
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                  Close
-                </button>
-                <a :href="`http://127.0.0.1:5000/static/${book.file}`"
-                  ><button type="button" class="btn btn-primary">Buy it</button></a
-                >
-              </div>
+              <form @submit.prevent="payment">
+                <div class="modal-body">
+                  <h5>Purpose of payment</h5>
+                  <p>
+                    <small>Purchase of book {{ book.title }}</small>
+                  </p>
+                  <h6>Amount</h6>
+                  <p>
+                    <small>{{ book.price }}</small>
+                  </p>
+
+                  <label for="cardnumber">
+                    <h6>Card Number</h6>
+                  </label>
+                  <input type="text" id="cardnumber" class="form-control" placeholder="Card Number" required />
+                  <br />
+                  <div class="row">
+                    <div class="col">
+                      <label for="expiry">
+                        <h6>Expiry</h6>
+                      </label>
+                      <input type="text" id="expiry" class="form-control" placeholder="Expiry" required />
+                    </div>
+                    <div class="col">
+                      <label for="cvv">
+                        <h6>CVV</h6>
+                      </label>
+                      <input type="text" id="cvv" class="form-control" placeholder="CVV" required />
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                  </button>
+                  <a :href="`http://127.0.0.1:5000/static/${book.file}`"><button type="submit" class="btn btn-success">
+                      Pay ₹{{ Math.round(book.price) }}
+                    </button></a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
-        <a
-          v-if="isBookBorrowed & !isSuperUser"
+
+        <a v-if="is_purchased"
           :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.file}`"
-          type="application/pdf"
-          target="_blank"
-        >
+          type="application/pdf" target="_blank">
           <button class="btn btn-secondary me-1">Read</button>
         </a>
-        <a v-if="!isSuperUser & !isBookBorrowed">
+        <button v-if="isLoggedIn & !is_purchased & !isSuperUser" type="button" class="btn btn-primary me-1" data-bs-toggle="modal"
+          data-bs-target="#exampleModal">
+          Buy
+        </button>
+        <a v-if="isBookBorrowed & !isSuperUser"
+          :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.file}`"
+          type="application/pdf" target="_blank">
+          <button class="btn btn-secondary me-1">Read</button>
+        </a>
+        <a v-if="!isSuperUser & !isBookBorrowed & !is_purchased">
           <button @click="requestBook(book.id)" class="btn btn-primary me-1">Request book</button>
         </a>
-        <a
-          v-if="isSuperUser"
+        <a v-if="isSuperUser"
           :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.file}`"
-          type="application/pdf"
-          target="_blank"
-        >
+          type="application/pdf" target="_blank">
           <button class="btn btn-secondary me-1">View</button>
         </a>
+
       </div>
     </div>
     <br />
@@ -85,13 +95,7 @@
     <div class="rating-component">
       <form @submit.prevent="submitRating(book.id)">
         <div class="stars">
-          <span
-            v-for="star in 5"
-            :key="star"
-            class="star"
-            :class="{ filled: star <= rating }"
-            @click="setRating(star)"
-          >
+          <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= rating }" @click="setRating(star)">
             ★
           </span>
         </div>
@@ -104,22 +108,15 @@
       </form>
 
       <div class="ratings-list" v-if="ratings.length > 0">
-        <h3>Ratings</h3><p>Average: {{ book.avg_rating }}</p>
+        <h3>Ratings</h3>
+        <p>Average: {{ book.avg_rating }}</p>
         <div v-for="(item, index) in ratings" :key="index" class="rating-item">
-          <small
-            >{{ item.user_name }} - {{ item.created_at }}
+          <small>{{ item.user_name }} - {{ item.created_at }}
             <a @click="deleteComment(item.id)" href="##">
-              <span v-if="isSuperUser" class="material-symbols-outlined">delete</span></a
-            ></small
-          >
+              <span v-if="isSuperUser" class="material-symbols-outlined">delete</span></a></small>
 
           <div class="stars small-stars">
-            <span
-              v-for="star in 5"
-              :key="star"
-              class="star"
-              :class="{ filled: star <= item.rating }"
-            >
+            <span v-for="star in 5" :key="star" class="star" :class="{ filled: star <= item.rating }">
               ★
             </span>
           </div>
@@ -133,17 +130,31 @@
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
       <div class="col-md-4 d-flex align-items-center">
         <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
-          <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+          <svg class="bi" width="30" height="24">
+            <use xlink:href="#bootstrap"></use>
+          </svg>
         </a>
         <span class="mb-3 mb-md-0 text-body-secondary">© 2024 Library @iitm</span>
       </div>
       <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
-        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
-        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+        <li class="ms-3">
+          <a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#twitter"></use>
+            </svg></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#instagram"></use>
+            </svg></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+              <use xlink:href="#facebook"></use>
+            </svg></a>
+        </li>
       </ul>
     </footer>
-</div>
+  </div>
 </template>
 
 <script>
@@ -174,7 +185,8 @@ export default {
       book: [],
       user: JSON.parse(localStorage.getItem('user')) || null,
       isBookBorrowed: false,
-      ratings: []
+      ratings: [],
+      is_purchased: false
     }
   },
   methods: {
@@ -243,9 +255,13 @@ export default {
           formdata.append('book_id', book_id)
           formdata.append('rating', this.rating)
           formdata.append('comment', this.comment)
-          const response = await axios.post('http://localhost:5000/api/book/submit-rating', formdata, {
-            headers: { 'x-access-token': this.user.token }
-          })
+          const response = await axios.post(
+            'http://localhost:5000/api/book/submit-rating',
+            formdata,
+            {
+              headers: { 'x-access-token': this.user.token }
+            }
+          )
           loader.hide()
           if (response.status === 200) {
             this.comment = ''
@@ -281,13 +297,51 @@ export default {
       } catch (error) {
         console.error('Error deleting rating', error)
       }
+    },
+    async payment() { 
+      try {
+        const response = await axios.post('http://localhost:5000/api/book/payment', 
+        {
+          book_id: this.book.id,
+          amount: this.book.price,
+        },
+        {
+          headers: { 'x-access-token': this.user.token },
+        })
+        if (response.status === 200) {
+          this.$toast.default(response.data.message, {
+            duration: 2000,
+            type: response.data.status
+          })
+          await this.IsPurchased()
+          await this.getBook()
+        }
+      } catch (error) {
+        console.error('Error deleting rating', error)
+      }
+    },
+    async IsPurchased() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/book/is_purchased', 
+        {
+          headers: { 'x-access-token': this.user.token },
+          params: { 'book_id': this.id }
+        },
+        )
+        if (response.status === 200){
+          this.is_purchased = response.data.is_purchased
+        }
+    } catch (error) {
+      console.error("Error making request [is_purchased]", error)
     }
+  }
   },
   created() {
     this.id = this.$route.params.id
     this.getBook()
     this.isBorrowed()
     this.getRatings()
+    this.IsPurchased()
   }
 }
 </script>
