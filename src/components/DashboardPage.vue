@@ -68,23 +68,40 @@
 
     <!-- Chart Containers -->
     <div class="row justify-content-center">
+
       <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card-body">
           <h4 class="text-center mb-3">Section</h4>
-          <div class="chart-container">
-            <canvas id="sections" class="chart"></canvas>
-          </div>
+            <Pie
+            id="my-chart-id"
+            :options="sectionChartData.chartOptions"
+            :data="sectionChartData"
+          />
         </div>
       </div>
 
       <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card-body">
           <h4 class="text-center mb-3">Users</h4>
-          <div class="chart-container">
-            <canvas id="users" class="chart"></canvas>
-          </div>
+            <Line
+            id="my-chart-id"
+            :options="userChartData.chartOptions"
+            :data="userChartData"
+          />
         </div>
       </div>
+      <p></p>
+      <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card-body">
+          <h4 class="text-center mb-3">Payments</h4>
+            <Bar
+            id="my-chart-id"
+            :options="paymentChartData.chartOptions"
+            :data="paymentChartData"
+          />
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -93,7 +110,9 @@
 import Sidebar from '@/components/SidebarLine.vue'
 import { ref, onMounted, inject } from 'vue'
 import axios from 'axios'
-import { Chart } from 'chart.js/auto'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, Colors, PointElement, LineElement } from 'chart.js'
+import { Bar, Line, Pie } from 'vue-chartjs'
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, Colors, PointElement, LineElement)
 
 const current_borrowed = ref(null)
 const total_books = ref(null)
@@ -131,65 +150,55 @@ const getStats = async () => {
   }
 }
 
-const createSectionChart = () => {
-  fetch('http://localhost:5000/api/chart/sections')
-    .then((response) => response.json())
-    .then((data) => {
-      var ctx = document.getElementById('sections')
-      new Chart(ctx, {
-        type: 'pie',
-        data: data.chart_data,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      })
-    })
+const sectionChartData = ref({
+  labels: [],
+  datasets: [{ 
+    data: [],  
+    backgroundColor: ["#0074D9", "#FF4136", "#2ECC40", "#FF851B", "#7FDBFF", "#B10DC9", "#FFDC00", "#001f3f", "#39CCCC", "#01FF70", "#85144b", "#F012BE", "#3D9970", "#111111", "#AAAAAA"] 
+  }],
+  chartOptions: {
+    responsive: true,
+    aspectRatio: 2,
+}
+});
+
+const userChartData = ref({
+  labels: [],
+  datasets: [{ data: [] }],
+  chartOptions: {
+    responsive: true,
+    aspectRatio: 2,
+}
+});
+
+const paymentChartData = ref({
+  labels: [],
+  datasets: [{ data: [] }],
+  chartOptions: {
+    responsive: true,
+    aspectRatio: 2,
+}
+});
+
+const sectionChart = async () => {
+  const response = await axios.get('http://localhost:5000/api/chart/sections')
+  sectionChartData.value = response.data.chartData
 }
 
-const createUserChart = () => {
-  fetch('http://localhost:5000/api/chart/users')
-    .then((response) => response.json())
-    .then((data) => {
-      var ctx = document.getElementById('users')
-      new Chart(ctx, {
-        type: 'line',
-        data: data.chart_data,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            xAxes: [
-              {
-                type: 'time',
-                time: {
-                  unit: 'day',
-                  displayFormats: {
-                    day: 'MMM D'
-                  }
-                },
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Date'
-                }
-              }
-            ],
-            y: {
-              beginAtZero: true,
-              scaleLabel: {
-                display: true,
-                labelString: 'Number of Users'
-              }
-            }
-          }
-        }
-      })
-    })
+const userChart = async () => {
+  const response = await axios.get('http://localhost:5000/api/chart/users')
+  userChartData.value = response.data.chartData
+}
+
+const paymentChart = async () => {
+  const response = await axios.get('http://localhost:5000/api/chart/payment')
+  paymentChartData.value = response.data.chartData
 }
 
 onMounted(() => {
-  getStats()
-  createSectionChart()
-  createUserChart()
+  getStats(),
+  sectionChart()
+  userChart()
+  paymentChart()
 })
 </script>

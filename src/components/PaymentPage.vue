@@ -23,7 +23,6 @@
         </tbody>
       </table>
     </div>
-  
 </template>
 
 <script setup>
