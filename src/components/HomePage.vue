@@ -130,6 +130,6 @@ export default {
   },
   created() {
     this.getBooks()
-  }
+  },
 }
 </script>

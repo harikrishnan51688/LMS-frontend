@@ -69,6 +69,7 @@
           :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.file}`"
           type="application/pdf" target="_blank">
           <button class="btn btn-secondary me-1">Read</button>
+          <a :href="`http://127.0.0.1:5000/static/${book.file}`"><button class="btn btn-success me-1">Download</button></a>
         </a>
         <button v-if="isLoggedIn & !is_purchased & !isSuperUser" type="button" class="btn btn-primary me-1" data-bs-toggle="modal"
           data-bs-target="#exampleModal">

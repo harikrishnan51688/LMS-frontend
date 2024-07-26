@@ -126,6 +126,14 @@ const router = createRouter({
         isSuperUser: true
       }
     },
+    {
+      path: '/payment',
+      name: 'payment',
+      component: () => import('@/components/PaymentPage.vue'),
+      meta: {
+        isSuperUser: true
+      }
+    },
   ]
 })
 

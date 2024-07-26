@@ -9,6 +9,7 @@
           <li class="nav-item"><router-link to="/add-book" class="nav-link text-white">Add book</router-link></li>
           <li class="nav-item"><router-link to="/add-section" class="nav-link text-white">Add section</router-link></li>
           <li class="nav-item"><router-link to="/sections" class="nav-link text-white">Manage section</router-link></li>
+          <li class="nav-item"><router-link to="/payment" class="nav-link text-white">Payments</router-link></li>
         </ul>
       </div>
     </template>
