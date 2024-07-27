@@ -27,6 +27,40 @@
   </div>
 
   <div v-if="pending_requests.length > 0" class="container mt-4">
+    <h2>Purchased Books</h2>
+    <ul class="list-group">
+      <li
+        v-for="book in purchased_books"
+        :key="book.id"
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <div class="d-flex">
+          <img
+            :src="`http://127.0.0.1:5000/static/${book.image}`"
+            class="me-3"
+            alt="Product 1"
+            style="width: 64px; height: 106px"
+          />
+          <div>
+            <h5 class="mt-0">{{ book.title }}</h5>
+            {{ book.subtitle }}
+          </div>
+        </div>
+        <div>
+          <a
+            :href="`https://mozilla.github.io/pdf.js/web/viewer.html?file=http://127.0.0.1:5000/static/${book.file}`"
+            type="application/pdf"
+            target="_blank"
+          >
+          <button type="button" class="btn btn-secondary rounded-pill btn-sm me-1"> Read </button>
+          </a>
+          <a :href="`http://127.0.0.1:5000/static/${book.file}`"><button type="button" class="btn btn-success rounded-pill btn-sm">Download</button></a>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div v-if="pending_requests.length > 0" class="container mt-4">
     <h2>Pending requests</h2>
     <ul class="list-group">
       <li
@@ -235,6 +269,7 @@ const $toast = useToast()
 const pending_requests = ref([])
 const borrowed_books = ref([])
 const returned_books = ref([])
+const purchased_books = ref([])
 const user = JSON.parse(localStorage.getItem('user')) || null
 const user_id = ref('')
 const task_id = ref(localStorage.getItem('task_id') || null)
@@ -260,6 +295,7 @@ const getProfile = async () => {
     pending_requests.value = response.data.pending_requests
     returned_books.value = response.data.returned_books
     borrowed_books.value = response.data.borrowed_books
+    purchased_books.value = response.data.purchased_books
     loader.hide()
   } catch (error) {
     console.error('Error fetching UserProfile details', error)

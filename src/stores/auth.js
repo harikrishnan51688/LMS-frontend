@@ -21,11 +21,10 @@ export const useAuthStore = defineStore('auth', {
     },
     async login(email, password) {
       try {
-        const response = await axios.get(`${API_URL}/api/login`, {
-          auth: {
-            username: email,
+        const response = await axios.post(`${API_URL}/api/login`, {
+            email: email,
             password: password
-          }
+          
         })
         if (response.data.token) {
           this.user = response.data

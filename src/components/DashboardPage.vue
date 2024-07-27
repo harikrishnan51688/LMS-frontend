@@ -68,7 +68,6 @@
 
     <!-- Chart Containers -->
     <div class="row justify-content-center">
-
       <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card-body">
           <h4 class="text-center mb-3">Section</h4>
