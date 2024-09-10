@@ -26,7 +26,7 @@
     <h3>No data available!</h3>
   </div>
 
-  <div v-if="pending_requests.length > 0" class="container mt-4">
+  <div v-if="purchased_books.length > 0" class="container mt-4">
     <h2>Purchased Books</h2>
     <ul class="list-group">
       <li
@@ -464,7 +464,8 @@ const isEmpty = computed(() => {
   return (
     pending_requests.value.length === 0 &&
     borrowed_books.value.length === 0 &&
-    returned_books.value.length === 0
+    returned_books.value.length === 0 &&
+    purchased_books.value.length === 0
   )
 })
 onMounted(() => {
